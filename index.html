@@ -687,6 +687,21 @@
 
   // Inicializar Firebase
   const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+  async function salvarTexto() {
+    const texto = document.getElementById("textoPublicacao").value;
+    try {
+      await setDoc(doc(db, "publicacoes", "home"), {
+        texto: texto,
+        atualizadoEm: new Date()
+      });
+      alert("Texto salvo com sucesso!");
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      alert("Erro ao salvar o texto.");
+    }
+  }
 </script>
 
 </body>
