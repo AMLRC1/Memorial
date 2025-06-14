@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-Br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Memorial - Associação de Moradores do Loteamento Residencial Catarina I</title>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Open Sans', sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      color: #333;
+    }
+    header {
+      background: #fff;
+      padding: 1em;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    header img {
+      max-height: 100px;
+    }
+    h1 {
+      font-size: 1.5em;
+      margin: 0.2em 0;
+    }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: #007B7F;
+      padding: 0.5em;
+    }
+    nav button {
+      margin: 0.3em;
+      padding: 0.5em 1em;
+      border: none;
+      background: #fff;
+      color: #007B7F;
+      font-weight: bold;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    nav button:hover {
+      background: #e0f7f8;
+    }
+    section {
+      max-width: 900px;
+      margin: 2em auto;
+      background: #fff;
+      padding: 2em;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5em;
+    }
+    .section-header h2 {
+      color: #007B7F;
+      margin: 0;
+    }
+    .new-post-btn {
+      padding: 0.5em 1em;
+      background: #28a745; /* Cor verde para 'Novo' */
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none; /* Escondido por padrão */
+    }
+    .new-post-btn:hover {
+      background: #218838;
+    }
+
+    .publication {
+      margin-bottom: 2.5em;
+      padding-bottom: 1.5em;
+      border-bottom: 1px dashed #eee;
+    }
+    .publication:last-child {
+      border-bottom: none;
+    }
+    .publication h4 {
+      color: #007B7F;
+      margin-top: 0;
+    }
+    .publication-meta {
+      font-size: 0.8em;
+      color: #777;
+      margin-bottom: 0.5em;
+    }
+    .publication-content {
+      margin-top: 1em;
+    }
+    .publication-audio audio {
+      display: block;
+      margin-top: 1em;
+    }
+    .publication-images {
+      display: flex;
+      flex-wrap: wrap;
+      margin-top: 1em;
+    }
+    .publication-images img {
+      max-height: 100px;
+      margin: 0.3em;
+      cursor: pointer; /* Indica que é clicável */
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      transition: transform 0.2s ease-in-out;
+    }
+    .publication-images img:hover {
+        transform: scale(1.05);
+    }
+
+    .publication-actions {
+      text-align: right;
+      margin-top: 1em;
+    }
+    .publication-actions button {
+      padding: 0.4em 0.8em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85em;
+      margin-left: 0.5em;
+    }
+    .edit-btn {
+      background: #007BFF; /* Azul para editar */
+      color: #fff;
+      display: none; /* Escondido por padrão */
+    }
+    .edit-btn:hover {
+      background: #0056b3;
+    }
+    .delete-btn {
+      background: #dc3545; /* Vermelho para deletar */
+      color: #fff;
+      display: none; /* Escondido por padrão */
+    }
+    .delete-btn:hover {
+      background: #c82333;
+    }
+
+    /* Editor de Publicação */
+    .publication-editor {
+      background: #f9f9f9;
+      padding: 1.5em;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      margin-top: 1.5em;
+      display: none; /* Escondido por padrão */
+    }
+    .publication-editor .toolbar {
+      margin-bottom: 0.8em;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 0.5em;
+    }
+    .publication-editor .toolbar button {
+      margin-right: 8px;
+      padding: 0.4em 0.7em;
+      border: none;
+      background: #007B7F;
+      color: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .publication-editor .toolbar button:hover {
+      background: #005f62;
+    }
+    .publication-editor iframe {
+      width: 100%;
+      height: 250px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      margin-bottom: 1em;
+    }
+    .publication-editor label {
+      display: block;
+      margin-bottom: 0.3em;
+      font-weight: bold;
+      color: #555;
+    }
+    .publication-editor input[type="file"] {
+      margin-bottom: 1em;
+    }
+    .publication-editor .save-btn, .publication-editor .cancel-btn {
+      margin-top: 1em;
+      padding: 0.6em 1.2em;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .publication-editor .save-btn {
+      background: #007B7F;
+      color: #fff;
+    }
+    .publication-editor .save-btn:hover {
+      background: #005f62;
+    }
+    .publication-editor .cancel-btn {
+      background: #6c757d; /* Cinza para cancelar */
+      color: #fff;
+      margin-left: 0.5em;
+    }
+    .publication-editor .cancel-btn:hover {
+      background: #5a6268;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1em;
+      font-size: 0.9em;
+      color: #777;
+    }
+
+    /* Modal de Imagem */
+    .image-modal {
+        display: none; /* Escondido por padrão */
+        position: fixed; /* Fica no topo da tela */
+        z-index: 1000; /* Acima de tudo */
+        left: 0;
+        top: 0;
+        width: 100%; /* Largura total */
+        height: 100%; /* Altura total */
+        overflow: auto; /* Permite scroll se a imagem for muito grande */
+        background-color: rgba(0,0,0,0.9); /* Fundo escuro semi-transparente */
+        justify-content: center;
+        align-items: center;
+    }
+    .image-modal-content {
+        margin: auto;
+        display: block;
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain; /* Garante que a imagem se ajuste */
+    }
+    .image-modal-close {
+        position: absolute;
+        top: 15px;
+        right: 35px;
+        color: #f1f1f1;
+        font-size: 40px;
+        font-weight: bold;
+        transition: 0.3s;
+        cursor: pointer;
+    }
+    .image-modal-close:hover,
+    .image-modal-close:focus {
+        color: #bbb;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+  <header>
+    <img src="LOGO JPEG.jpg" alt="Logo Associação de Moradores do Loteamento Residencial Catarina I">
+    <h1>Memorial da Associação de Moradores do Loteamento Residencial Catarina I</h1>
+    <p>Juntos somos mais fortes</p>
+  </header>
+  <nav>
+    <button onclick="showSection('linha')">Linha do Tempo</button>
+    <button onclick="showSection('juridico')">Assuntos Jurídicos</button>
+    <button onclick="showSection('gestao')">Gestão da Associação</button>
+    <button onclick="showSection('melhorias')">Melhorias do Loteamento</button>
+    <button onclick="showSection('conflitos')">Conflitos com a Ouro</button>
+    <button onclick="showSection('eventos')">Eventos Sociais</button>
+  </nav>
+
+  <section id="conteudo">
+    <div id="linha" class="content-section" style="display:block">
+        <div class="section-header">
+            <h2 id="linhaTitle">Linha do Tempo</h2>
+            <button class="new-post-btn" id="newLinhaPostBtn" onclick="createNewPost('linha')">Nova Publicação</button>
+        </div>
+        <div id="linhaPublications">
+            </div>
+    </div>
+
+    <div id="juridico" class="content-section" style="display:none">
+        <div class="section-header">
+            <h2 id="juridicoTitle">Assuntos Jurídicos</h2>
+            <button class="new-post-btn" id="newJuridicoPostBtn" onclick="createNewPost('juridico')">Nova Publicação</button>
+        </div>
+        <div id="juridicoPublications">
+            <p>Conteúdo para Assuntos Jurídicos...</p>
+        </div>
+    </div>
+    
+    <div id="gestao" class="content-section" style="display:none">
+        <div class="section-header">
+            <h2 id="gestaoTitle">Gestão da Associação</h2>
+            <button class="new-post-btn" id="newGestaoPostBtn" onclick="createNewPost('gestao')">Nova Publicação</button>
+        </div>
+        <div id="gestaoPublications">
+            <p>Conteúdo para Gestão da Associação...</p>
+        </div>
+    </div>
+
+    <div id="melhorias" class="content-section" style="display:none">
+        <div class="section-header">
+            <h2 id="melhoriasTitle">Melhorias do Loteamento</h2>
+            <button class="new-post-btn" id="newMelhoriasPostBtn" onclick="createNewPost('melhorias')">Nova Publicação</button>
+        </div>
+        <div id="melhoriasPublications">
+            <p>Conteúdo para Melhorias do Loteamento...</p>
+        </div>
+    </div>
+
+    <div id="conflitos" class="content-section" style="display:none">
+        <div class="section-header">
+            <h2 id="conflitosTitle">Conflitos com a Ouro</h2>
+            <button class="new-post-btn" id="newConflitosPostBtn" onclick="createNewPost('conflitos')">Nova Publicação</button>
+        </div>
+        <div id="conflitosPublications">
+            <p>Conteúdo para Conflitos com a Ouro...</p>
+        </div>
+    </div>
+
+    <div id="eventos" class="content-section" style="display:none">
+        <div class="section-header">
+            <h2 id="eventosTitle">Eventos Sociais</h2>
+            <button class="new-post-btn" id="newEventosPostBtn" onclick="createNewPost('eventos')">Nova Publicação</button>
+        </div>
+        <div id="eventosPublications">
+            <p>Conteúdo para Eventos Sociais...</p>
+        </div>
+    </div>
+
+  </section>
+
+  <footer>
+    © 2025 Associação de Moradores do Loteamento Residencial Catarina I
+  </footer>
+
+  <div id="imageModal" class="image-modal">
+    <span class="image-modal-close" onclick="closeImageModal()">&times;</span>
+    <img class="image-modal-content" id="img01">
+  </div>
+
+  <script>
+    let isAdminLoggedIn = false;
+    let currentEditingPublication = null; // Para rastrear qual publicação está sendo editada
+    let currentEditorIframe = null; // Para rastrear o iframe do editor atual
+
+    // Estrutura de dados para armazenar as publicações
+    // Em um ambiente real, isso viria de um servidor/banco de dados
+    let siteData = {
+      linha: [
+        {
+          id: 'linha-pub-1',
+          title: 'Fundação da Associação',
+          text: '<p>Em <strong>15 de Março de 2010</strong>, um grupo de moradores visionários se reuniu para fundar a Associação de Moradores do Loteamento Residencial Catarina I, com o objetivo de buscar melhorias para a comunidade e fortalecer os laços entre os vizinhos. Esta data marca o início de uma jornada de união e progresso.</p>',
+          audioSrc: '',
+          imageSrcs: [],
+          creationDate: new Date('2010-03-15T10:00:00').toISOString(),
+          lastEditDate: new Date('2023-01-20T14:30:00').toISOString()
+        },
+        {
+          id: 'linha-pub-2',
+          title: 'Primeira Reunião de Moradores',
+          text: '<p>A primeira grande reunião da Associação ocorreu em <strong>20 de Abril de 2010</strong>. Nela, foram discutidos os primeiros desafios do loteamento, como a necessidade de pavimentação das ruas e a instalação de iluminação pública. A participação foi expressiva e demonstrou o engajamento da comunidade.</p>',
+          audioSrc: '',
+          imageSrcs: [],
+          creationDate: new Date('2010-04-20T15:00:00').toISOString(),
+          lastEditDate: new Date('2024-05-10T11:00:00').toISOString()
+        }
+      ],
+      juridico: [], // Exemplo: Outras seções podem ter seus próprios arrays de publicações
+      gestao: [],
+      melhorias: [],
+      conflitos: [],
+      eventos: []
+    };
+
+    // Função para formatar a data
+    function formatDateTime(isoString) {
+        if (!isoString) return 'Data indisponível';
+        const date = new Date(isoString);
+        return date.toLocaleString('pt-BR', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    // Função para renderizar as publicações de uma seção
+    function renderPublications(sectionId) {
+      const container = document.getElementById(`${sectionId}Publications`);
+      if (!container) return;
+
+      container.innerHTML = ''; // Limpa o conteúdo existente
+
+      const publications = siteData[sectionId];
+      if (!publications || publications.length === 0) {
+        container.innerHTML = `<p>Nenhuma publicação encontrada nesta seção.</p>`;
+        return;
+      }
+
+      publications.forEach(pub => {
+        const publicationDiv = document.createElement('div');
+        publicationDiv.className = 'publication';
+        publicationDiv.id = `pub-${pub.id}`; // ID único para a publicação
+
+        const creationDate = formatDateTime(pub.creationDate);
+        const editDate = formatDateTime(pub.lastEditDate);
+
+        publicationDiv.innerHTML = `
+          <h4>${pub.title}</h4>
+          <div class="publication-meta">
+            <span>Publicado em: ${creationDate}</span>
+            ${pub.creationDate !== pub.lastEditDate ? ` | <span>Última edição: ${editDate}</span>` : ''}
+          </div>
+          <div class="publication-content">${pub.text}</div>
+          ${pub.audioSrc ? `<div class="publication-audio"><audio controls src="${pub.audioSrc}"></audio></div>` : ''}
+          <div class="publication-images">
+            ${pub.imageSrcs.map(src => `<img src="${src}" alt="Imagem da publicação" onclick="openImageModal(this.src)">`).join('')}
+          </div>
+          <div class="publication-actions">
+            <button class="edit-btn ${isAdminLoggedIn ? '' : 'display-none'}" onclick="editPublication('${sectionId}', '${pub.id}')">Editar</button>
+            <button class="delete-btn ${isAdminLoggedIn ? '' : 'display-none'}" onclick="deletePublication('${sectionId}', '${pub.id}')">Excluir</button>
+          </div>
+          <div class="publication-editor" id="editor-${pub.id}">
+            <div class="toolbar">
+              <button onclick="execCmd('bold', 'editor-${pub.id}')">Negrito</button>
+              <button onclick="execCmd('italic', 'editor-${pub.id}')">Itálico</button>
+              <button onclick="execCmd('underline', 'editor-${pub.id}')">Sublinhado</button>
+              <button onclick="execCmd('insertUnorderedList', 'editor-${pub.id}')">• Lista</button>
+              <button onclick="execCmd('insertOrderedList', 'editor-${pub.id}')">1. Lista</button>
+              <button onclick="execCmd('formatBlock', 'editor-${pub.id}', '<p>')">Parágrafo</button>
+            </div>
+            <label>Título da Publicação:</label>
+            <input type="text" id="title-editor-${pub.id}" value="${pub.title}" style="width:100%; padding:0.5em; margin-bottom:1em;">
+            <label>Conteúdo:</label>
+            <iframe id="iframe-editor-${pub.id}"></iframe>
+            <label>Upload de Podcast (WAV):</label>
+            <input type="file" accept="audio/wav" onchange="loadEditorAudio(event, '${pub.id}')"><br>
+            <label>Upload de Imagens (até 5):</label>
+            <input type="file" accept="image/*" multiple onchange="loadEditorImages(event, '${pub.id}')"><br>
+            <button class="save-btn" onclick="savePublication('${sectionId}', '${pub.id}')">Salvar</button>
+            <button class="cancel-btn" onclick="cancelEdit('${pub.id}')">Cancelar</button>
+          </div>
+        `;
+        container.appendChild(publicationDiv);
+
+        // Inicializa o iframe do editor (necessário após ser adicionado ao DOM)
+        const iframe = document.getElementById(`iframe-editor-${pub.id}`);
+        if (iframe) {
+            iframe.contentDocument.designMode = 'on';
+            iframe.contentDocument.body.innerHTML = pub.text;
+        }
+      });
+
+      updateAdminControls(); // Garante que botões de edição/exclusão/nova publicação estejam corretos
+    }
+
+    // Função para mostrar a seção selecionada
+    function showSection(id) {
+      document.querySelectorAll('.content-section').forEach(div => div.style.display = 'none');
+      const target = document.getElementById(id);
+      if (target) {
+        target.style.display = 'block';
+        renderPublications(id); // Renderiza as publicações ao mostrar a seção
+      }
+    }
+
+    // Autenticação para administrador
+    function authenticateAdmin() {
+      const password = prompt('Digite a senha para acesso de administrador:');
+      if (password === 'admin123') {
+        isAdminLoggedIn = true;
+        alert('Acesso de administrador concedido!');
+      } else {
+        isAdminLoggedIn = false;
+        alert('Senha incorreta. Acesso negado.');
+      }
+      // Re-renderiza a seção atual para atualizar a visibilidade dos botões
+      const currentSectionId = document.querySelector('.content-section[style*="display: block"]').id;
+      renderPublications(currentSectionId);
+    }
+
+    // Atualiza a visibilidade dos controles de admin
+    function updateAdminControls() {
+        document.querySelectorAll('.new-post-btn').forEach(btn => {
+            btn.style.display = isAdminLoggedIn ? 'inline-block' : 'none';
+        });
+        document.querySelectorAll('.edit-btn, .delete-btn').forEach(btn => {
+            btn.style.display = isAdminLoggedIn ? 'inline-block' : 'none';
+        });
+    }
+
+    // --- Funções de Edição de Publicação ---
+
+    // Abre o editor para uma publicação existente
+    function editPublication(sectionId, publicationId) {
+        if (!isAdminLoggedIn) {
+            alert('Você precisa ser um administrador para editar.');
+            return;
+        }
+
+        // Esconde qualquer outro editor que possa estar aberto
+        if (currentEditingPublication && currentEditingPublication !== `editor-${publicationId}`) {
+            document.getElementById(currentEditingPublication).style.display = 'none';
+        }
+
+        const editorDiv = document.getElementById(`editor-${publicationId}`);
+        const iframe = document.getElementById(`iframe-editor-${publicationId}`);
+        const publication = siteData[sectionId].find(p => p.id === publicationId);
+        const titleInput = document.getElementById(`title-editor-${publicationId}`);
+
+        if (editorDiv && iframe && publication && titleInput) {
+            editorDiv.style.display = 'block';
+            iframe.contentDocument.body.innerHTML = publication.text;
+            titleInput.value = publication.title; // Preenche o título no editor
+            currentEditingPublication = `editor-${publicationId}`;
+            currentEditorIframe = iframe; // Define o iframe atual para comandos
+        }
+    }
+
+    // Cria uma nova publicação (vazia) e abre o editor
+    function createNewPost(sectionId) {
+        if (!isAdminLoggedIn) {
+            alert('Você precisa ser um administrador para criar novas publicações.');
+            return;
+        }
+
+        const newId = `pub-${Date.now()}`; // ID único baseado no timestamp
+        const newPublication = {
+            id: newId,
+            title: 'Nova Publicação (clique para editar título)',
+            text: '<p>Escreva seu conteúdo aqui...</p>',
+            audioSrc: '',
+            imageSrcs: [],
+            creationDate: new Date().toISOString(),
+            lastEditDate: new Date().toISOString()
+        };
+
+        siteData[sectionId].unshift(newPublication); // Adiciona no início
+        renderPublications(sectionId); // Renderiza a seção para mostrar a nova publicação
+
+        // Abre o editor da nova publicação
+        editPublication(sectionId, newId);
+    }
+
+    // Executa comandos no iframe do editor
+    function execCmd(command, editorId, value = null) {
+      const iframe = document.getElementById(`iframe-${editorId}`);
+      if (iframe && iframe.contentDocument) {
+        iframe.contentDocument.execCommand(command, false, value);
+      }
+    }
+
+    // Carrega áudio para o editor
+    function loadEditorAudio(event, publicationId) {
+      const file = event.target.files[0];
+      if (file && file.type === 'audio/wav') {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const sectionId = document.querySelector('.content-section[style*="display: block"]').id;
+          const publication = siteData[sectionId].find(p => p.id === publicationId);
+          if (publication) {
+            publication.audioSrc = e.target.result;
+            // O áudio será carregado na visualização ao salvar
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        alert('Por favor, selecione um arquivo WAV.');
+      }
+    }
+
+    // Carrega imagens para o editor
+    function loadEditorImages(event, publicationId) {
+        const files = Array.from(event.target.files).slice(0, 5); // Limita a 5 imagens
+        const sectionId = document.querySelector('.content-section[style*="display: block"]').id;
+        const publication = siteData[sectionId].find(p => p.id === publicationId);
+
+        if (!publication) return;
+
+        publication.imageSrcs = []; // Limpa as imagens existentes para este editor
+
+        files.forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    publication.imageSrcs.push(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Salva as alterações de uma publicação
+    function savePublication(sectionId, publicationId) {
+      const editorDiv = document.getElementById(`editor-${publicationId}`);
+      const iframe = document.getElementById(`iframe-editor-${publicationId}`);
+      const titleInput = document.getElementById(`title-editor-${publicationId}`);
+      const publication = siteData[sectionId].find(p => p.id === publicationId);
+
+      if (iframe && publication && titleInput) {
+        publication.text = iframe.contentDocument.body.innerHTML;
+        publication.title = titleInput.value;
+        publication.lastEditDate = new Date().toISOString(); // Atualiza data de edição
+
+        editorDiv.style.display = 'none'; // Esconde o editor
+        currentEditingPublication = null;
+        currentEditorIframe = null;
+
+        renderPublications(sectionId); // Re-renderiza a seção para mostrar as alterações
+      }
+    }
+
+    // Cancela a edição
+    function cancelEdit(publicationId) {
+        const editorDiv = document.getElementById(`editor-${publicationId}`);
+        if (editorDiv) {
+            editorDiv.style.display = 'none';
+            currentEditingPublication = null;
+            currentEditorIframe = null;
+        }
+    }
+
+    // Deleta uma publicação
+    function deletePublication(sectionId, publicationId) {
+        if (!isAdminLoggedIn) {
+            alert('Você precisa ser um administrador para excluir publicações.');
+            return;
+        }
+        if (confirm('Tem certeza que deseja excluir esta publicação?')) {
+            siteData[sectionId] = siteData[sectionId].filter(p => p.id !== publicationId);
+            renderPublications(sectionId);
+        }
+    }
+
+    // --- Funções do Modal de Imagem ---
+    const imageModal = document.getElementById('imageModal');
+    const modalImg = document.getElementById("img01");
+
+    function openImageModal(src) {
+        imageModal.style.display = "flex"; // Usa flex para centralizar
+        modalImg.src = src;
+    }
+
+    function closeImageModal() {
+        imageModal.style.display = "none";
+    }
+
+    // --- Inicialização ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // Adiciona o botão de login/admin na parte superior direita (exemplo)
+      const header = document.querySelector('header');
+      const adminLoginBtn = document.createElement('button');
+      adminLoginBtn.textContent = 'Login Admin';
+      adminLoginBtn.style.cssText = 'position: absolute; top: 1em; right: 1em; padding: 0.5em 1em; background: #007B7F; color: #fff; border: none; border-radius: 5px; cursor: pointer;';
+      adminLoginBtn.onclick = authenticateAdmin;
+      header.appendChild(adminLoginBtn);
+
+      // Carrega a seção "Linha do Tempo" por padrão
+      renderPublications('linha');
+    });
+
+  </script>
+</body>
+</html>
