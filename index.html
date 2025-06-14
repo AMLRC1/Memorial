@@ -671,11 +671,14 @@
     });
 
   </script>
-  <script type="module">
-  // Importações do Firebase
+  <h2>Publicação de Teste</h2>
+<textarea id="textoPublicacao" rows="5" cols="60"></textarea><br>
+<button onclick="salvarTexto()">Salvar texto</button>
+
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  
-  // Sua configuração copiada do console
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
   const firebaseConfig = {
     apiKey: "AIzaSyCgCL1MYnjB1AqlY0fWqZws-cZcTxFhm6s",
   authDomain: "memorial-amlrc-i.firebaseapp.com",
@@ -685,9 +688,8 @@
   appId: "1:434494566194:web:3af2319c1ba100a64a312b"
   };
 
-  // Inicializar Firebase
   const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  const db = getFirestore(app);
 
   async function salvarTexto() {
     const texto = document.getElementById("textoPublicacao").value;
@@ -703,6 +705,7 @@
     }
   }
 </script>
+
 
 </body>
 </html>
