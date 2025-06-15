@@ -18,7 +18,8 @@
       padding: 1em;
       text-align: center;
       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      img src="images/logo.jpeg" alt="Logo da Associação" style="height: 80px;"
+      /* This line seems to be an error in the original CSS, removed for correctness */
+      /* img src="images/logo.jpeg" alt="Logo da Associação" style="height: 80px;" */
     }
     header img {
       max-height: 100px;
@@ -283,7 +284,8 @@
             <button class="new-post-btn" id="newLinhaPostBtn" onclick="createNewPost('linha')">Nova Publicação</button>
         </div>
         <div id="linhaPublications">
-            </div>
+            <p>Carregando publicações...</p>
+        </div>
     </div>
 
     <div id="juridico" class="content-section" style="display:none">
@@ -292,17 +294,17 @@
             <button class="new-post-btn" id="newJuridicoPostBtn" onclick="createNewPost('juridico')">Nova Publicação</button>
         </div>
         <div id="juridicoPublications">
-            <p>Conteúdo para Assuntos Jurídicos...</p>
+            <p>Carregando publicações...</p>
         </div>
     </div>
-    
+
     <div id="gestao" class="content-section" style="display:none">
         <div class="section-header">
             <h2 id="gestaoTitle">Gestão da Associação</h2>
             <button class="new-post-btn" id="newGestaoPostBtn" onclick="createNewPost('gestao')">Nova Publicação</button>
         </div>
         <div id="gestaoPublications">
-            <p>Conteúdo para Gestão da Associação...</p>
+            <p>Carregando publicações...</p>
         </div>
     </div>
 
@@ -312,7 +314,7 @@
             <button class="new-post-btn" id="newMelhoriasPostBtn" onclick="createNewPost('melhorias')">Nova Publicação</button>
         </div>
         <div id="melhoriasPublications">
-            <p>Conteúdo para Melhorias do Loteamento...</p>
+            <p>Carregando publicações...</p>
         </div>
     </div>
 
@@ -322,7 +324,7 @@
             <button class="new-post-btn" id="newConflitosPostBtn" onclick="createNewPost('conflitos')">Nova Publicação</button>
         </div>
         <div id="conflitosPublications">
-            <p>Conteúdo para Conflitos com a Ouro...</p>
+            <p>Carregando publicações...</p>
         </div>
     </div>
 
@@ -332,7 +334,7 @@
             <button class="new-post-btn" id="newEventosPostBtn" onclick="createNewPost('eventos')">Nova Publicação</button>
         </div>
         <div id="eventosPublications">
-            <p>Conteúdo para Eventos Sociais...</p>
+            <p>Carregando publicações...</p>
         </div>
     </div>
 
@@ -347,42 +349,44 @@
     <img class="image-modal-content" id="img01">
   </div>
 
-  <script>
-    let isAdminLoggedIn = false;
-    let currentEditingPublication = null; // Para rastrear qual publicação está sendo editada
-    let currentEditorIframe = null; // Para rastrear o iframe do editor atual
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 
-    // Estrutura de dados para armazenar as publicações
-    // Em um ambiente real, isso viria de um servidor/banco de dados
-    let siteData = {
-      linha: [
-        {
-          id: 'linha-pub-1',
-          title: 'Fundação da Associação',
-          text: '<p>Em <strong>15 de Março de 2010</strong>, um grupo de moradores visionários se reuniu para fundar a Associação de Moradores do Loteamento Residencial Catarina I, com o objetivo de buscar melhorias para a comunidade e fortalecer os laços entre os vizinhos. Esta data marca o início de uma jornada de união e progresso.</p>',
-          audioSrc: '',
-          imageSrcs: [],
-          creationDate: new Date('2010-03-15T10:00:00').toISOString(),
-          lastEditDate: new Date('2023-01-20T14:30:00').toISOString()
-        },
-        {
-          id: 'linha-pub-2',
-          title: 'Primeira Reunião de Moradores',
-          text: '<p>A primeira grande reunião da Associação ocorreu em <strong>20 de Abril de 2010</strong>. Nela, foram discutidos os primeiros desafios do loteamento, como a necessidade de pavimentação das ruas e a instalação de iluminação pública. A participação foi expressiva e demonstrou o engajamento da comunidade.</p>',
-          audioSrc: '',
-          imageSrcs: [],
-          creationDate: new Date('2010-04-20T15:00:00').toISOString(),
-          lastEditDate: new Date('2024-05-10T11:00:00').toISOString()
-        }
-      ],
-      juridico: [], // Exemplo: Outras seções podem ter seus próprios arrays de publicações
-      gestao: [],
-      melhorias: [],
-      conflitos: [],
-      eventos: []
+  <script>
+    // Your Firebase project configuration
+    // REPLACE WITH YOUR ACTUAL FIREBASE CONFIG
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
     };
 
-    // Função para formatar a data
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+    const storage = firebase.storage();
+    const storageRef = storage.ref();
+
+    let isAdminLoggedIn = false;
+    let currentEditingPublication = null;
+    let currentEditorIframe = null;
+
+    // Use an object to store data fetched from Firebase
+    let siteData = {
+      linha: {},
+      juridico: {},
+      gestao: {},
+      melhorias: {},
+      conflitos: {},
+      eventos: {}
+    };
+
+    // Function to format the date
     function formatDateTime(isoString) {
         if (!isoString) return 'Data indisponível';
         const date = new Date(isoString);
@@ -395,23 +399,29 @@
         });
     }
 
-    // Função para renderizar as publicações de uma seção
+    // Function to render publications from fetched data
     function renderPublications(sectionId) {
       const container = document.getElementById(`${sectionId}Publications`);
       if (!container) return;
 
-      container.innerHTML = ''; // Limpa o conteúdo existente
+      container.innerHTML = '';
 
       const publications = siteData[sectionId];
-      if (!publications || publications.length === 0) {
+      if (!publications || Object.keys(publications).length === 0) {
         container.innerHTML = `<p>Nenhuma publicação encontrada nesta seção.</p>`;
         return;
       }
 
-      publications.forEach(pub => {
+      // Sort publications by creation date in descending order
+      const sortedPublicationKeys = Object.keys(publications).sort((a, b) => {
+        return new Date(publications[b].creationDate) - new Date(publications[a].creationDate);
+      });
+
+      sortedPublicationKeys.forEach(pubId => {
+        const pub = publications[pubId];
         const publicationDiv = document.createElement('div');
         publicationDiv.className = 'publication';
-        publicationDiv.id = `pub-${pub.id}`; // ID único para a publicação
+        publicationDiv.id = `pub-${pub.id}`;
 
         const creationDate = formatDateTime(pub.creationDate);
         const editDate = formatDateTime(pub.lastEditDate);
@@ -425,7 +435,7 @@
           <div class="publication-content">${pub.text}</div>
           ${pub.audioSrc ? `<div class="publication-audio"><audio controls src="${pub.audioSrc}"></audio></div>` : ''}
           <div class="publication-images">
-            ${pub.imageSrcs.map(src => `<img src="${src}" alt="Imagem da publicação" onclick="openImageModal(this.src)">`).join('')}
+            ${pub.imageSrcs && pub.imageSrcs.length > 0 ? pub.imageSrcs.map(src => `<img src="${src}" alt="Imagem da publicação" onclick="openImageModal(this.src)">`).join('') : ''}
           </div>
           <div class="publication-actions">
             <button class="edit-btn ${isAdminLoggedIn ? '' : 'display-none'}" onclick="editPublication('${sectionId}', '${pub.id}')">Editar</button>
@@ -454,7 +464,6 @@
         `;
         container.appendChild(publicationDiv);
 
-        // Inicializa o iframe do editor (necessário após ser adicionado ao DOM)
         const iframe = document.getElementById(`iframe-editor-${pub.id}`);
         if (iframe) {
             iframe.contentDocument.designMode = 'on';
@@ -462,20 +471,21 @@
         }
       });
 
-      updateAdminControls(); // Garante que botões de edição/exclusão/nova publicação estejam corretos
+      updateAdminControls();
     }
 
-    // Função para mostrar a seção selecionada
-    function showSection(id) {
+    // Function to show the selected section and fetch data
+    async function showSection(id) {
       document.querySelectorAll('.content-section').forEach(div => div.style.display = 'none');
       const target = document.getElementById(id);
       if (target) {
         target.style.display = 'block';
-        renderPublications(id); // Renderiza as publicações ao mostrar a seção
+        await fetchPublications(id); // Fetch data when showing the section
+        renderPublications(id);
       }
     }
 
-    // Autenticação para administrador
+    // Authenticate Admin
     function authenticateAdmin() {
       const password = prompt('Digite a senha para acesso de administrador:');
       if (password === 'admin123') {
@@ -485,12 +495,12 @@
         isAdminLoggedIn = false;
         alert('Senha incorreta. Acesso negado.');
       }
-      // Re-renderiza a seção atual para atualizar a visibilidade dos botões
+      // Re-render the current section to update button visibility
       const currentSectionId = document.querySelector('.content-section[style*="display: block"]').id;
       renderPublications(currentSectionId);
     }
 
-    // Atualiza a visibilidade dos controles de admin
+    // Update visibility of admin controls
     function updateAdminControls() {
         document.querySelectorAll('.new-post-btn').forEach(btn => {
             btn.style.display = isAdminLoggedIn ? 'inline-block' : 'none';
@@ -500,42 +510,41 @@
         });
     }
 
-    // --- Funções de Edição de Publicação ---
+    // --- Publication Editing Functions ---
 
-    // Abre o editor para uma publicação existente
+    // Open editor for an existing publication
     function editPublication(sectionId, publicationId) {
         if (!isAdminLoggedIn) {
             alert('Você precisa ser um administrador para editar.');
             return;
         }
 
-        // Esconde qualquer outro editor que possa estar aberto
         if (currentEditingPublication && currentEditingPublication !== `editor-${publicationId}`) {
             document.getElementById(currentEditingPublication).style.display = 'none';
         }
 
         const editorDiv = document.getElementById(`editor-${publicationId}`);
         const iframe = document.getElementById(`iframe-editor-${publicationId}`);
-        const publication = siteData[sectionId].find(p => p.id === publicationId);
+        const publication = siteData[sectionId][publicationId];
         const titleInput = document.getElementById(`title-editor-${publicationId}`);
 
         if (editorDiv && iframe && publication && titleInput) {
             editorDiv.style.display = 'block';
             iframe.contentDocument.body.innerHTML = publication.text;
-            titleInput.value = publication.title; // Preenche o título no editor
+            titleInput.value = publication.title;
             currentEditingPublication = `editor-${publicationId}`;
-            currentEditorIframe = iframe; // Define o iframe atual para comandos
+            currentEditorIframe = iframe;
         }
     }
 
-    // Cria uma nova publicação (vazia) e abre o editor
+    // Create a new (empty) publication and open the editor
     function createNewPost(sectionId) {
         if (!isAdminLoggedIn) {
             alert('Você precisa ser um administrador para criar novas publicações.');
             return;
         }
 
-        const newId = `pub-${Date.now()}`; // ID único baseado no timestamp
+        const newId = database.ref().child(sectionId).push().key; // Firebase unique key
         const newPublication = {
             id: newId,
             title: 'Nova Publicação (clique para editar título)',
@@ -546,14 +555,20 @@
             lastEditDate: new Date().toISOString()
         };
 
-        siteData[sectionId].unshift(newPublication); // Adiciona no início
-        renderPublications(sectionId); // Renderiza a seção para mostrar a nova publicação
-
-        // Abre o editor da nova publicação
-        editPublication(sectionId, newId);
+        // Add to Firebase and local data
+        database.ref(`${sectionId}/${newId}`).set(newPublication)
+            .then(() => {
+                siteData[sectionId][newId] = newPublication;
+                renderPublications(sectionId);
+                editPublication(sectionId, newId);
+            })
+            .catch(error => {
+                console.error("Error creating new post:", error);
+                alert("Erro ao criar nova publicação.");
+            });
     }
 
-    // Executa comandos no iframe do editor
+    // Execute commands in the editor iframe
     function execCmd(command, editorId, value = null) {
       const iframe = document.getElementById(`iframe-${editorId}`);
       if (iframe && iframe.contentDocument) {
@@ -561,67 +576,90 @@
       }
     }
 
-    // Carrega áudio para o editor
-    function loadEditorAudio(event, publicationId) {
+    // Load audio for the editor and upload to Firebase Storage
+    async function loadEditorAudio(event, publicationId) {
       const file = event.target.files[0];
       if (file && file.type === 'audio/wav') {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const sectionId = document.querySelector('.content-section[style*="display: block"]').id;
-          const publication = siteData[sectionId].find(p => p.id === publicationId);
-          if (publication) {
-            publication.audioSrc = e.target.result;
-            // O áudio será carregado na visualização ao salvar
-          }
-        };
-        reader.readAsDataURL(file);
+        const sectionId = document.querySelector('.content-section[style*="display: block"]').id;
+        const publication = siteData[sectionId][publicationId];
+
+        if (!publication) return;
+
+        const audioPath = `${sectionId}/${publicationId}/audio/${file.name}`;
+        const audioFileRef = storageRef.child(audioPath);
+
+        try {
+          const snapshot = await audioFileRef.put(file);
+          const downloadURL = await snapshot.ref.getDownloadURL();
+          publication.audioSrc = downloadURL;
+          alert('Áudio carregado com sucesso para o Firebase Storage!');
+        } catch (error) {
+          console.error("Error uploading audio:", error);
+          alert('Erro ao carregar áudio. Verifique o console para mais detalhes.');
+        }
       } else {
         alert('Por favor, selecione um arquivo WAV.');
       }
     }
 
-    // Carrega imagens para o editor
-    function loadEditorImages(event, publicationId) {
-        const files = Array.from(event.target.files).slice(0, 5); // Limita a 5 imagens
+    // Load images for the editor and upload to Firebase Storage
+    async function loadEditorImages(event, publicationId) {
+        const files = Array.from(event.target.files).slice(0, 5);
         const sectionId = document.querySelector('.content-section[style*="display: block"]').id;
-        const publication = siteData[sectionId].find(p => p.id === publicationId);
+        const publication = siteData[sectionId][publicationId];
 
         if (!publication) return;
 
-        publication.imageSrcs = []; // Limpa as imagens existentes para este editor
+        publication.imageSrcs = []; // Clear existing images for this publication
 
-        files.forEach(file => {
+        for (const file of files) {
             if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    publication.imageSrcs.push(e.target.result);
-                };
-                reader.readAsDataURL(file);
+                const imagePath = `${sectionId}/${publicationId}/images/${file.name}`;
+                const imageFileRef = storageRef.child(imagePath);
+
+                try {
+                    const snapshot = await imageFileRef.put(file);
+                    const downloadURL = await snapshot.ref.getDownloadURL();
+                    publication.imageSrcs.push(downloadURL);
+                    alert(`Imagem ${file.name} carregada com sucesso!`);
+                } catch (error) {
+                    console.error(`Error uploading image ${file.name}:`, error);
+                    alert(`Erro ao carregar imagem ${file.name}. Verifique o console.`);
+                }
+            } else {
+                alert(`Arquivo ${file.name} não é uma imagem válida.`);
             }
-        });
+        }
     }
 
-    // Salva as alterações de uma publicação
+    // Save publication changes to Firebase
     function savePublication(sectionId, publicationId) {
       const editorDiv = document.getElementById(`editor-${publicationId}`);
       const iframe = document.getElementById(`iframe-editor-${publicationId}`);
       const titleInput = document.getElementById(`title-editor-${publicationId}`);
-      const publication = siteData[sectionId].find(p => p.id === publicationId);
+      const publication = siteData[sectionId][publicationId];
 
       if (iframe && publication && titleInput) {
         publication.text = iframe.contentDocument.body.innerHTML;
         publication.title = titleInput.value;
-        publication.lastEditDate = new Date().toISOString(); // Atualiza data de edição
+        publication.lastEditDate = new Date().toISOString();
 
-        editorDiv.style.display = 'none'; // Esconde o editor
-        currentEditingPublication = null;
-        currentEditorIframe = null;
-
-        renderPublications(sectionId); // Re-renderiza a seção para mostrar as alterações
+        database.ref(`${sectionId}/${publicationId}`).set(publication)
+            .then(() => {
+                editorDiv.style.display = 'none';
+                currentEditingPublication = null;
+                currentEditorIframe = null;
+                renderPublications(sectionId);
+                alert('Publicação salva com sucesso!');
+            })
+            .catch(error => {
+                console.error("Error saving publication:", error);
+                alert("Erro ao salvar publicação.");
+            });
       }
     }
 
-    // Cancela a edição
+    // Cancel editing
     function cancelEdit(publicationId) {
         const editorDiv = document.getElementById(`editor-${publicationId}`);
         if (editorDiv) {
@@ -629,26 +667,37 @@
             currentEditingPublication = null;
             currentEditorIframe = null;
         }
+        // Re-render the section to ensure original content is displayed if not saved
+        const currentSectionId = document.querySelector('.content-section[style*="display: block"]').id;
+        renderPublications(currentSectionId);
     }
 
-    // Deleta uma publicação
+    // Delete a publication from Firebase
     function deletePublication(sectionId, publicationId) {
         if (!isAdminLoggedIn) {
             alert('Você precisa ser um administrador para excluir publicações.');
             return;
         }
         if (confirm('Tem certeza que deseja excluir esta publicação?')) {
-            siteData[sectionId] = siteData[sectionId].filter(p => p.id !== publicationId);
-            renderPublications(sectionId);
+            database.ref(`${sectionId}/${publicationId}`).remove()
+                .then(() => {
+                    delete siteData[sectionId][publicationId]; // Remove from local data
+                    renderPublications(sectionId);
+                    alert('Publicação excluída com sucesso!');
+                })
+                .catch(error => {
+                    console.error("Error deleting publication:", error);
+                    alert("Erro ao excluir publicação.");
+                });
         }
     }
 
-    // --- Funções do Modal de Imagem ---
+    // --- Image Modal Functions ---
     const imageModal = document.getElementById('imageModal');
     const modalImg = document.getElementById("img01");
 
     function openImageModal(src) {
-        imageModal.style.display = "flex"; // Usa flex para centralizar
+        imageModal.style.display = "flex";
         modalImg.src = src;
     }
 
@@ -656,9 +705,20 @@
         imageModal.style.display = "none";
     }
 
-    // --- Inicialização ---
-    window.addEventListener('DOMContentLoaded', () => {
-      // Adiciona o botão de login/admin na parte superior direita (exemplo)
+    // --- Firebase Data Fetching ---
+    async function fetchPublications(sectionId) {
+        try {
+            const snapshot = await database.ref(sectionId).once('value');
+            siteData[sectionId] = snapshot.val() || {}; // Store fetched data
+        } catch (error) {
+            console.error(`Error fetching publications for ${sectionId}:`, error);
+            // Display a message to the user that data could not be loaded
+            document.getElementById(`${sectionId}Publications`).innerHTML = `<p>Erro ao carregar publicações.</p>`;
+        }
+    }
+
+    // --- Initialization ---
+    window.addEventListener('DOMContentLoaded', async () => {
       const header = document.querySelector('header');
       const adminLoginBtn = document.createElement('button');
       adminLoginBtn.textContent = 'Login Admin';
@@ -666,8 +726,11 @@
       adminLoginBtn.onclick = authenticateAdmin;
       header.appendChild(adminLoginBtn);
 
-      // Carrega a seção "Linha do Tempo" por padrão
-      renderPublications('linha');
+      // Load all sections' data initially or when needed
+      // For simplicity, we'll fetch only the 'linha' section on load and others on demand.
+      // If you want all data loaded at once, you can iterate through sections.
+      await fetchPublications('linha'); // Fetch data for the initial section
+      showSection('linha'); // Render the initial section
     });
 
   </script>
